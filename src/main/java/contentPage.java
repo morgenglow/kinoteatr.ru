@@ -1,9 +1,9 @@
 import org.openqa.selenium.WebDriver;
 
-public class contentPage {
+public class contentPage extends MainPage{
     private WebDriver driver;
 
     public contentPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 }
