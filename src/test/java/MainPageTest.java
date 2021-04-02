@@ -1,70 +1,165 @@
-import org.junit.After;
+import io.qameta.allure.Description;
+import io.qameta.allure.Step;
+import model.LoginMethods;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import java.time.Duration;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-public class MainPageTest {
-    private WebDriver driver;
-    private MainPage mainPage;
-    private WebDriverWait wait;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 
-    @Before
-    public void setUp() {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\Администратор\\IdeaProjects\\kinoteatr.ru\\Driver\\chromedriver.exe");
-        driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        driver.manage().window().maximize();
-        driver.get("https://kinoteatr.ru/");
-        mainPage = new MainPage(driver);
-    }
+public class MainPageTest extends BaseTest{
+    private List<String> browserTabs;
+    int linkCount;
 
-    //проверка заголовка страницы
+    @Step("Открытие главной страницы")
+    @Description("Проверка заголовка главной страницы")
     @Test
     public void getPageTitle() {
-        String title = driver.getTitle();
+        String title = mainPage.driver.getTitle();
         Assert.assertEquals("Кинотеатр.Ру - объединенная киносеть Синема Парк / Формула Кино - Москва", title);
     }
 
-    //закрытие всплывающего объявления
+    @Step("Подтверждение города нахождения - Москва")
     @Test
-    public void closePopUp() {
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//div[@class='popup_content special']")));
-        driver.findElement(By.xpath("//a[@id='service_popup_close']//img[1]")).click();
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='popup_content special']")));
-        Assert.assertFalse(driver.findElement(By.xpath("//div[@class='popup_content special']")).isDisplayed());
+    public void clickOnCity() {
+        mainPage.wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("pop_up_box")));
+        mainPage.driver.findElement(By.className("btn")).click();
+        Assert.assertTrue(mainPage.wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("pop_up_box"))));
     }
 
-    //проверка: клик на лого возвращает главную страницу
+    @Step("Изменение города нахождения на Воронеж")
     @Test
-    public void clickOnLogo(){
-        closePopUp();
-        wait.until(ExpectedConditions.visibilityOf(driver.findElement(mainPage.mainLogo)));
+    public void clickOnCityChange() {
+        mainPage.wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("pop_up_box")));
+        mainPage.driver.findElement(By.className("btn2")).click();
+        mainPage.wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='cities active']")));
+        mainPage.driver.findElement(By.xpath("//a[@data-city-code='voronezh']")).click();
+        Assert.assertEquals("https://kinoteatr.ru/voronezh/", mainPage.driver.getCurrentUrl());
+    }
+
+    @Step("Проверка: клик на лого возвращает главную страницу")
+    @Test
+    public void clickOnLogo() {
+        mainPage.wait.until(ExpectedConditions.visibilityOf(mainPage.driver.findElement(mainPage.mainLogo)));
         mainPage.clickOnLogo();
-        Assert.assertTrue(driver.getCurrentUrl().contentEquals("https://kinoteatr.ru/"));
+        Assert.assertTrue(mainPage.driver.getCurrentUrl().contentEquals("https://kinoteatr.ru/"));
     }
 
-    //выбор города из меню
+    @Step("Проверка работоспособности ссылки на VK")
+    @Test
+    public void clickOnVkLink() {
+        mainPage.driver.findElement(By.xpath("//span[@class='yad icon-yd-vk']")).click();
+        browserTabs = new ArrayList<String>(mainPage.driver.getWindowHandles());
+        mainPage.driver.switchTo().window(browserTabs.get(1));
+        Assert.assertEquals("https://vk.com/kinoteatr", mainPage.driver.getCurrentUrl());
+    }
+
+
+    @Test
+    public void clickOnIgLink() {
+        mainPage.driver.findElement(By.xpath("//span[@class='yad icon-yd-instagram']")).click();
+        browserTabs = new ArrayList<String>(mainPage.driver.getWindowHandles());
+        mainPage.driver.switchTo().window(browserTabs.get(1));
+        Assert.assertEquals("https://www.instagram.com/kinoteatr.official/", mainPage.driver.getCurrentUrl());
+    }
+
+    @Step("Подсчет количества доступных городов из меню")
+    @Test
+    public void cityCheck() {
+        mainPage.closePopUp();
+        mainPage.getCitiesList();
+        int linkCount = mainPage.citiesList.size();
+        System.out.println("Количество городов для выбора: " + linkCount);
+    }
+
+    @Step("Сравнение ожидаемого и фактического списка городов для выбора")
+    @Test
+    public void cityCompare(){
+        mainPage.closePopUp();
+//        System.out.println(mainPage.getText(mainPage.getCitiesList()));
+        List<String> textList =mainPage.getText(mainPage.getCitiesList());
+        System.out.println(textList);
+        Assert.assertEquals((new HashSet<>(Arrays.asList(mainPage.expectedCitiesList))), (new HashSet<>(Arrays.asList(textList))));
+    }
+
+    @Step("Переход на вкладку с контентом")
+    @Test
+    public void switchToTheatre(){
+        mainPage.closePopUp();
+        mainPage.clickUniversal(By.xpath("//a[@href='#theatre']"));
+        ContentPage contentPage = new ContentPage(mainPage.driver);
+        Assert.assertEquals("TheatreHD: театр в кино", contentPage.driver.findElement(By.xpath("//div[@class='wrap_title theatre_container_header']")).getText());
+    }
+
+//    @Step("Проверка работоспособности ссылок на города из меню")
 //    @Test
-//    public void cityCheck(){
+//    public void cityClick() throws InterruptedException {
+//        int i = 0;
 //        mainPage.closePopUp();
-//        wait.until(ExpectedConditions.visibilityOf(driver.findElement(mainPage.currentCity)));
-//        mainPage.chooseCity(4);
-//        Assert.assertEquals(mainPage.getCity(), "Москва");
+//        mainPage.getCitiesList();
+//        int linkCount = mainPage.citiesList.size();
+//        String[] linkTexts = new String[linkCount];
+//
+//        for (WebElement elements : mainPage.citiesList) {
+//            linkTexts[i] = elements.getText();
+//            i++;
+//        }
+//
+//        for (int t = 0; t < linkCount; t++) {
+//            mainPage.citiesList.get(t).click();
+//            if (driver.getTitle().equals("Page 404")) {
+//                System.out.println("\"" + linkTexts[t] + "\""
+//                        + " is not working.");
+//            } else {
+//                System.out.println("\"" + linkTexts[t] + "\""
+//                        + " is working.");
+//            }
+//            driver.navigate().back();
+//        }
 //    }
 
-    @After
-    public void tearDown() {
-        //driver.quit();
+    @Step("Неудачная попытка авторизации по незарегистрированному телефону")
+    @Test
+    public void loginPhoneFail() {
+        mainPage.closePopUp();
+        loginMethods = new LoginMethods(mainPage.driver);
+        loginMethods.openLoginWindow();
+        loginMethods.typePhoneNumber("9081434905");
+        String value = loginMethods.driver.findElement(By.xpath("(//p[@class='header error'])[2]")).getText();
+        MatcherAssert.assertThat(value,containsString("Номер не зарегистрирован"));
     }
+
+    @Step("Неудачная попытка авторизации по незарегистрированному емейлу")
+    @Test
+    public void loginMailFail() {
+        mainPage.closePopUp();
+        loginMethods = new LoginMethods(mainPage.driver);
+        loginMethods.openLoginWindow();
+        loginMethods.typeEmail("something@gimail.com", "pass123");
+        String value = loginMethods.driver.findElement(By.xpath("(//p[@class='header error'])[2]")).getText();
+        MatcherAssert.assertThat(value,containsString("Такой email не зарегистрирован"));
+    }
+
+
+    //    //закрытие всплывающего объявления
+//    @Test
+//    public void closePopUp() {
+//        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+//        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//div[@class='popup_content special']")));
+//        driver.findElement(By.xpath("//a[@id='service_popup_close']//img[1]")).click();
+//        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='popup_content special']")));
+//        Assert.assertFalse(driver.findElement(By.xpath("//div[@class='popup_content special']")).isDisplayed());
+//    }
+//
+
 
 }

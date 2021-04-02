@@ -16,8 +16,8 @@ public class KinoBroChat {
         return this;
     }
 
-    public contentPage closeChat (){
+    public ContentPage closeChat (){
         driver.findElement(closeChat).click();
-        return new contentPage(driver);
+        return new ContentPage(driver);
     }
 }

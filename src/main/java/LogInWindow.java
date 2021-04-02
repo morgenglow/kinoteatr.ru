@@ -36,9 +36,9 @@ public class LogInWindow {
     }
 
 //закрытие окна аутентификации
-    public contentPage closeLogInWindow (){
+    public ContentPage closeLogInWindow (){
         driver.findElement(closeLogInWindow).click();
-        return new contentPage(driver);
+        return new ContentPage(driver);
     }
 
 //возврат в окно авторизации из окна регистрации
@@ -48,10 +48,10 @@ public class LogInWindow {
     }
 
 //авторизация по email
-    public contentPage emailAuth(String email, String password){
+    public ContentPage emailAuth(String email, String password){
         driver.findElement(emailField).sendKeys(email);
         driver.findElement(passField).sendKeys(password);
         driver.findElement(logInButton).submit();
-        return new contentPage(driver);
+        return new ContentPage(driver);
     }
 }
