@@ -79,8 +79,37 @@ public class MainPage {
         }
         return textList;
     }
-}
 
+    public void fillCardData(String cardNumber, String expiryData, String cvc) {
+        driver.switchTo().frame(0);
+        clickUniversal(By.id("pan"));
+        driver.findElement(By.id("pan")).sendKeys(cardNumber);
+        clickUniversal(By.id("expiry"));
+        driver.findElement(By.id("expiry")).clear();
+        driver.findElement(By.id("expiry")).sendKeys(expiryData);
+        driver.findElement(By.id("cvc")).clear();
+        driver.findElement(By.id("cvc")).sendKeys(cvc);
+    }
+
+    public void fillPresentForm() {
+        clickUniversal(By.xpath("//textarea[@name='to_name']"));
+        driver.findElement(By.xpath("//textarea[@name='to_name']")).sendKeys("Mila");
+        driver.findElement(By.id("text_message")).clear();
+        driver.findElement(By.id("text_message")).sendKeys("Happy birthday!");
+        driver.findElement(By.xpath("//textarea[@name='from_name']")).clear();
+        driver.findElement(By.xpath("//textarea[@name='from_name']")).sendKeys("Lucy");
+        driver.findElement(By.id("to-email-field")).clear();
+        driver.findElement(By.id("to-email-field")).sendKeys("mila@mila.com");
+        driver.findElement(By.id("from-email-field")).clear();
+        driver.findElement(By.id("from-email-field")).sendKeys("Lucy@lucy.com");
+        cardOptions("(//label[@class='checkbox']//span)[2]", "(//span[text()='Оплатить и отправить'])[2]");
+    }
+
+    public void cardOptions(String cardSumm, String cardDesign) {
+        clickUniversal(By.xpath(cardSumm));
+        clickUniversal(By.xpath(cardDesign));
+    }
+}
 //вызов элемента меню по его индексу
 //    public contentPage chooseMenu(int i) {
 //        menuBar.get(i).click();

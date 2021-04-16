@@ -4,6 +4,7 @@ import model.LoginMethods;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -13,12 +14,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.enabled;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 
 public class MainPageTest extends BaseTest{
     private List<String> browserTabs;
-    int linkCount;
 
     @Step("Открытие главной страницы")
     @Description("Проверка заголовка главной страницы")
@@ -85,20 +86,20 @@ public class MainPageTest extends BaseTest{
     @Test
     public void cityCompare(){
         mainPage.closePopUp();
-//        System.out.println(mainPage.getText(mainPage.getCitiesList()));
         List<String> textList =mainPage.getText(mainPage.getCitiesList());
         System.out.println(textList);
         Assert.assertEquals((new HashSet<>(Arrays.asList(mainPage.expectedCitiesList))), (new HashSet<>(Arrays.asList(textList))));
     }
 
-    @Step("Переход на вкладку с контентом")
-    @Test
-    public void switchToTheatre(){
-        mainPage.closePopUp();
-        mainPage.clickUniversal(By.xpath("//a[@href='#theatre']"));
-        ContentPage contentPage = new ContentPage(mainPage.driver);
-        Assert.assertEquals("TheatreHD: театр в кино", contentPage.driver.findElement(By.xpath("//div[@class='wrap_title theatre_container_header']")).getText());
-    }
+//
+//    @Step("Переход на вкладку с контентом")
+//    @Test
+//    public void switchToTheatre(){
+//        mainPage.closePopUp();
+//        mainPage.clickUniversal(By.xpath("//a[@href='#theatre']"));
+//        ContentPage contentPage = new ContentPage(mainPage.driver);
+//        Assert.assertEquals("TheatreHD: театр в кино", contentPage.driver.findElement(By.xpath("//div[@class='wrap_title theatre_container_header']")).getText());
+//    }
 
 //    @Step("Проверка работоспособности ссылок на города из меню")
 //    @Test
@@ -126,40 +127,5 @@ public class MainPageTest extends BaseTest{
 //            driver.navigate().back();
 //        }
 //    }
-
-    @Step("Неудачная попытка авторизации по незарегистрированному телефону")
-    @Test
-    public void loginPhoneFail() {
-        mainPage.closePopUp();
-        loginMethods = new LoginMethods(mainPage.driver);
-        loginMethods.openLoginWindow();
-        loginMethods.typePhoneNumber("9081434905");
-        String value = loginMethods.driver.findElement(By.xpath("(//p[@class='header error'])[2]")).getText();
-        MatcherAssert.assertThat(value,containsString("Номер не зарегистрирован"));
-    }
-
-    @Step("Неудачная попытка авторизации по незарегистрированному емейлу")
-    @Test
-    public void loginMailFail() {
-        mainPage.closePopUp();
-        loginMethods = new LoginMethods(mainPage.driver);
-        loginMethods.openLoginWindow();
-        loginMethods.typeEmail("something@gimail.com", "pass123");
-        String value = loginMethods.driver.findElement(By.xpath("(//p[@class='header error'])[2]")).getText();
-        MatcherAssert.assertThat(value,containsString("Такой email не зарегистрирован"));
-    }
-
-
-    //    //закрытие всплывающего объявления
-//    @Test
-//    public void closePopUp() {
-//        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-//        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//div[@class='popup_content special']")));
-//        driver.findElement(By.xpath("//a[@id='service_popup_close']//img[1]")).click();
-//        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='popup_content special']")));
-//        Assert.assertFalse(driver.findElement(By.xpath("//div[@class='popup_content special']")).isDisplayed());
-//    }
-//
-
 
 }

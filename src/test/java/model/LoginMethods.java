@@ -24,6 +24,7 @@ public class LoginMethods {
     public void typePhoneNumber(String number) {
         driver.findElement(By.id("auth_by_phone")).click();
         driver.findElement(By.id("login_phone")).click();
+        driver.findElement(By.id("login_phone")).clear();
         driver.findElement(By.id("login_phone")).sendKeys(number);
         driver.findElement(By.id("auth_login_by_phone")).click();
     }
