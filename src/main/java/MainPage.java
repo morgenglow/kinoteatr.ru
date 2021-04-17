@@ -1,4 +1,5 @@
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -13,8 +14,9 @@ public class MainPage {
     public WebDriverWait wait;
     public String currCity;
     public static List<WebElement> citiesList;
-    public List<String> textList =new ArrayList<>();;
-    public final List<String> expectedCitiesList = new ArrayList(Arrays.asList("Москва","Санкт-Петербург","Белгород","Волгоград","Вологда","Воронеж","Екатеринбург","Ижевск","Калининград","Ковров","Краснодар","Красноярск","Мурманск","Набережные Челны","Нижний Новгород","Новокузнецк","Новосибирск","Пермь","Рязань","Самара","Саратов","Сочи","Ставрополь","Сургут","Сыктывкар","Тула","Тюмень","Ульяновск","Уфа","Челябинск"));
+    public List<String> textList = new ArrayList<>();
+    ;
+    public final List<String> expectedCitiesList = new ArrayList(Arrays.asList("Москва", "Санкт-Петербург", "Белгород", "Волгоград", "Вологда", "Воронеж", "Екатеринбург", "Ижевск", "Калининград", "Ковров", "Краснодар", "Красноярск", "Мурманск", "Набережные Челны", "Нижний Новгород", "Новокузнецк", "Новосибирск", "Пермь", "Рязань", "Самара", "Саратов", "Сочи", "Ставрополь", "Сургут", "Сыктывкар", "Тула", "Тюмень", "Ульяновск", "Уфа", "Челябинск"));
 
     public MainPage(WebDriver driver) {
         this.driver = driver;
@@ -72,7 +74,7 @@ public class MainPage {
     }
 
     public List<String> getText(List<WebElement> element) {
-        for(int i=0; i<citiesList.size(); i++){
+        for (int i = 0; i < citiesList.size(); i++) {
             String city = citiesList.get(i).getText();
             city = city.replaceAll("^\\s+|\\s+$", "");
             textList.add(city);
@@ -108,6 +110,15 @@ public class MainPage {
     public void cardOptions(String cardSumm, String cardDesign) {
         clickUniversal(By.xpath(cardSumm));
         clickUniversal(By.xpath(cardDesign));
+    }
+
+    public boolean isElementPresent(By by) {
+        try {
+            driver.findElement(by);
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
     }
 }
 //вызов элемента меню по его индексу

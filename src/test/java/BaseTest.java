@@ -9,12 +9,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import static org.junit.Assert.fail;
 
 public class BaseTest {
-    private final ApplicationManager applicationManager = new ApplicationManager(System.getProperty("browser", BrowserType.FIREFOX));
+    private final ApplicationManager applicationManager = new ApplicationManager(System.getProperty("browser", BrowserType.CHROME));
     public MainPage mainPage;
     public LoginMethods loginMethods;
+    public KinoBroChat kinoBroChat;
     private StringBuffer verificationErrors = new StringBuffer();
-    CardData cardData = new CardData("1234567890123456", "12/22", "123");
-
 
     @BeforeEach
     public void setUp() {
